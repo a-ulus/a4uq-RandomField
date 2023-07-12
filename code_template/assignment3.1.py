@@ -4,8 +4,9 @@ from matplotlib.pyplot import *
 # standard definition of the Wiener process
 # W_0 = 0, W_{t + dt} = W_t + zeta_t. zeta_t ~ N(0, dt)
 def WP_std_def(zeta, t):
-	W = None
-
+	W = np.zeros(len(t))
+	for i in range(1, len(t)):
+		W[i] = W[i-1] + zeta[i-1] * np.sqrt(t[i] - t[i-1])
 	return W
 
 # KL approximation of the Wiener process
@@ -34,35 +35,20 @@ if __name__ == '__main__':
 	dt = 1./N
 	t 	= np.arange(0, 1+dt, dt)
 
-	# Parameters
-	m = 1000
-
-	# Compute eigenvalues
-	eigenvalues = karhunen_loeve_eigenvalues(m)
-	print(eigenvalues)
-	eigenvalues_wo_outliers = [item for item in eigenvalues if item< 100]
-
-	# Plot the eigenvalues
-	plot(eigenvalues, 'bo')
-	xlabel('Eigenvalue index')
-	ylabel('Eigenvalue')
-	title('Eigenvalues of Karhunen-Loeve Expansion')
-	show()
-
-	# Plot the eigenvalues without outliers
-	plot(eigenvalues_wo_outliers, 'bo')
-	xlabel('Eigenvalue index')
-	ylabel('Eigenvalue')
-	title('Eigenvalues without outliers of Karhunen-Loeve Expansion')
-	show()
-
 	# first, use the standard defition to generate a realization with N samples
 
 	# generate random variables zeta
-
+	zeta = np.random.normal(0, np.sqrt(dt), N)
 	# generate Wiener processes
-
+	W = WP_std_def(zeta, t)
 	# plot processes over time
+	#for i in range(N-1):
+		#plot(t[i], W[i], label=f"M = {M[i]}")
+	plot(t, W)
+	xlabel("Time")
+	ylabel("Wiener Process")
+	legend()
+	show()
 
 	# use the KL expansion to approximation the Wiener process
 	
