@@ -30,6 +30,22 @@ def KL_expansion(t, eigvals):
     #psi_t += np.sqrt(2) * np.sqrt(eigvals[i]) * np.sin(np.pi * (i - 0.5) * t) * X[i]
     return psi_t
 
+def plot_w(t, W, M):
+    plot(t, W)
+    xlabel("Time")
+    ylabel("Wiener Process")
+    name =  "Wiener Process over time, M = " + str(M)
+    title(name)
+    show()
+
+def plot_kl(t, W, M):
+    plot(t, W)
+    xlabel("Time")
+    ylabel("Wiener Process KL Approximation")
+    name = "Wiener Process  KL Approximation over time, M = " + str(M)
+    title(name)
+    show()
+
 
 if __name__ == '__main__':
     # the two sizes mentioned in the worksheet
@@ -46,21 +62,15 @@ if __name__ == '__main__':
     # generate Wiener processes
     W = WP_std_def(zeta, t)
     # plot processes over time
-    plot(t, W)
-    xlabel("Time")
-    ylabel("Wiener Process")
-    title("Wiener Process over time")
-    show()
+    plot_w(t, W, N)
+
 
     # use the KL expansion to approximation the Wiener process
     zeta2 = np.random.normal(0, 1, N+1)
     W_KL_approx = np.zeros(len(t))
-    W_KL_approx = WP_KL_approx(zeta,t, N)
-    plot(t, W_KL_approx)
-    xlabel("Time")
-    ylabel("Wiener Process KL Approximation")
-    title("Wiener Process  KL Approximation over time")
-    show()
+    W_KL_approx = WP_KL_approx(zeta2,t, N)
+    plot_kl(t, W_KL_approx, N)
+
 
     #eigenvalues
     eigenvalues = np.zeros(N)
@@ -85,5 +95,9 @@ if __name__ == '__main__':
     """
 
     # use the same random variables for all M
+    for m in M:
+        W_KL_approx = WP_KL_approx(zeta2, t, m)
+        plot_kl(t, W_KL_approx, m)
+
 
 
