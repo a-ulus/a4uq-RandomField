@@ -45,33 +45,26 @@ if __name__ == '__main__':
 
 	# we need the standard mean and variance to sample for a standard multivariate Gaussian
 
-	# plot the sample for cov_1
-	no_figures = 3
-	samples1 = np.dot(np.random.normal(0, 1, (N ** 2, no_figures)).T, L1.T)
-	samples1_grid = samples1.T.reshape(no_figures, N, N)
-	fig, axes = subplots(nrows=2, ncols=no_figures, figsize=(12, 6))
-	for i in range(no_figures):
-		#figure()
+	import math
 
-		# sample from the given random field
 
-		# plot the results <imshow(sample, cmap='coolwarm')>
-		axes[0, i].imshow(samples1_grid[i], cmap='jet', origin='lower')
-		axes[0, i].set_title(f'Sample {i + 1} (Covariance 1)')
-		axes[0, i].axis('off')
-	tight_layout()
-	show()
+	# Helper function
+	def ridge_reg(covariance_matrix, regularization_param):
 
+		n = covariance_matrix.shape[0]
+		regularized_matrix = covariance_matrix + regularization_param * np.eye(n)
+
+		return regularized_matrix
+
+	L2 = ridge_reg(covariance_matrix2, np.float64(1e-14))
 	# plot the sample for cov_2
 	no_figures = 3
 	samples2 = np.dot(np.random.normal(0, 1, (N ** 2, no_figures)).T, L2.T)
 	samples2_grid = samples2.T.reshape(no_figures, N, N)
 	fig, axes = subplots(nrows=2, ncols=no_figures, figsize=(12, 6))
 	for i in range(no_figures):
-		#figure()
-
+		# figure()
 		# sample from the given random field
-
 		# plot the results, you can use <imshow(sample, cmap='coolwarm')>
 		axes[1, i].imshow(samples2_grid[i], cmap='jet', origin='lower')
 		axes[1, i].set_title(f'Sample {i + 1} (Covariance 2)')
