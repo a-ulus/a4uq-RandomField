@@ -4,52 +4,86 @@ from matplotlib.pyplot import *
 # standard definition of the Wiener process
 # W_0 = 0, W_{t + dt} = W_t + zeta_t. zeta_t ~ N(0, dt)
 def WP_std_def(zeta, t):
-	W = np.zeros(len(t))
-	for i in range(1, len(t)):
-		W[i] = W[i-1] + zeta[i-1] * np.sqrt(t[i] - t[i-1])
-	return W
+    W = np.zeros(len(t))
+    for i in range(1, len(t)):
+        W[i] = W[i-1] + zeta[i-1] * np.sqrt(t[i] - t[i-1])
+    return W
 
 # KL approximation of the Wiener process
 def WP_KL_approx(zeta, t, M):
-	W = None
+    W = np.zeros(len(t))
+    for i in range(len(t)):
+        approx = 0.
+        for n in range(1, M):
+            approx += np.sin((n+0.5)*np.pi*t[i]) * zeta[n] / ((n+0.5)*np.pi)
+        W[i] = np.sqrt(2) * approx
+    return W
 
-	return W
+#second way of defining approximation (different zeta)
+def KL_expansion(t, eigvals):
+    n = len(eigvals)
+    X = np.random.normal(0, 1, n)  # Generate standard Gaussian random variables
+    psi_t = np.zeros_like(t)  # Initialize KL expansion
 
-
-def karhunen_loeve_eigenvalues(M):
-	# Generate a random covariance matrix
-	covariance_matrix = np.random.rand(M, M)
-	covariance_matrix = (covariance_matrix + covariance_matrix.T) / 2  # Make it symmetric
-
-	# Compute the eigenvalues of the covariance matrix
-	eigenvalues = np.linalg.eigvalsh(covariance_matrix)
-
-	return eigenvalues
+    for i in range(n):
+        psi_t +=  np.sqrt(eigvals[i]) * np.sin(np.pi * (i+1) * t)
+    #psi_t += np.sqrt(2) * np.sqrt(eigvals[i]) * np.sin(np.pi * (i - 0.5) * t) * X[i]
+    return psi_t
 
 
 if __name__ == '__main__':
-	# the two sizes mentioned in the worksheet
-	N = 1000
-	M = [10, 100, 1000]
-	
-	dt = 1./N
-	t 	= np.arange(0, 1+dt, dt)
+    # the two sizes mentioned in the worksheet
+    N = 1000
+    M = [10, 100, 1000]
 
-	# first, use the standard defition to generate a realization with N samples
+    dt = 1./N
+    t 	= np.arange(0, 1+dt, dt)
 
-	# generate random variables zeta
-	zeta = np.random.normal(0, np.sqrt(dt), N)
-	# generate Wiener processes
-	W = WP_std_def(zeta, t)
-	# plot processes over time
-	#for i in range(N-1):
-		#plot(t[i], W[i], label=f"M = {M[i]}")
-	plot(t, W)
-	xlabel("Time")
-	ylabel("Wiener Process")
-	legend()
-	show()
+    # first, use the standard defition to generate a realization with N samples
 
-	# use the KL expansion to approximation the Wiener process
-	
-	# use the same random variables for all M
+    # generate random variables zeta
+    zeta = np.random.normal(0, np.sqrt(dt), N)
+    # generate Wiener processes
+    W = WP_std_def(zeta, t)
+    # plot processes over time
+    plot(t, W)
+    xlabel("Time")
+    ylabel("Wiener Process")
+    title("Wiener Process over time")
+    show()
+
+    # use the KL expansion to approximation the Wiener process
+    zeta2 = np.random.normal(0, 1, N+1)
+    W_KL_approx = np.zeros(len(t))
+    W_KL_approx = WP_KL_approx(zeta,t, N)
+    plot(t, W_KL_approx)
+    xlabel("Time")
+    ylabel("Wiener Process KL Approximation")
+    title("Wiener Process  KL Approximation over time")
+    show()
+
+    #eigenvalues
+    eigenvalues = np.zeros(N)
+    for i in range(N):
+        eigenvalues[i] = 1/(((i-0.5) **2) * np.pi **2)
+
+    xlabel('Number in array')
+    ylabel('Eigenvalue')
+    title('Eigenvalues')
+    plot(eigenvalues)
+    show()
+
+
+    """W_appr_KL = np.zeros(len(t))
+    for i in range(len(t)):
+        W_appr_KL[i] = KL_expansion(t[i], eigenvalues)
+    plot(t, W_appr_KL)
+    xlabel("Time")
+    ylabel("Wiener Process KL Approximation")
+    title("Wiener Process KL Expansion Approximation over time")
+    show()
+    """
+
+    # use the same random variables for all M
+
+
